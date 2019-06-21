@@ -37,6 +37,9 @@ export default class SortableList extends Component {
     onChangeOrder: PropTypes.func,
     onActivateRow: PropTypes.func,
     onReleaseRow: PropTypes.func,
+
+    onContentLayout: PropTypes.func,
+    onContentSizeChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -109,23 +112,23 @@ export default class SortableList extends Component {
         this._rowsLayouts[key] = new Promise((resolve) => {
           this._resolveRowLayout[key] = resolve;
         });
+    });
+    
+    if (Object.keys(nextData).length != Object.keys(data).length) {
+      this.setState({
+        animated: false,
+        data: nextData,
+        containerLayout: null,
+        rowsLayouts: null,
+        order: nextOrder
       });
-
-      if (Object.keys(nextData).length > Object.keys(data).length) {
-        this.setState({
-          animated: false,
-          data: nextData,
-          containerLayout: null,
-          rowsLayouts: null,
-          order: nextOrder
-        });
-      } else {
-        this.setState({
-          data: nextData,
-          order: nextOrder
-        });
-      }
-
+    } else {	
+      this.setState({	
+        data: nextData,	
+        order: nextOrder	
+      });	
+    }
+    
     } else if (order && nextOrder && !shallowEqual(order, nextOrder)) {
       this.setState({order: nextOrder});
     }
@@ -219,6 +222,8 @@ export default class SortableList extends Component {
           scrollEnabled={scrollEnabled}
           showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
           showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+          onLayout={this.props.onContentLayout}
+          onContentSizeChange={this.props.onContentSizeChange}
           onScroll={this._onScroll}>
           {this._renderHeader()}
           <View style={innerContainerStyle}>
